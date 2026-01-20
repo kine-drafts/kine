@@ -2,7 +2,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer, NodeViewProps } from '@tiptap/r
 import { Node } from '@tiptap/core';
 import { Excalidraw } from '@excalidraw/excalidraw';
 import { parseMermaidToExcalidraw } from '@excalidraw/mermaid-to-excalidraw';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface DiagramData {
   elements?: any[];
@@ -16,14 +16,7 @@ const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
   const [hasGenerated, setHasGenerated] = useState(false);
   const prompt = node.attrs.prompt || '';
 
-  useEffect(() => {
-    // Auto-generate when component is first created with a prompt
-    if (prompt && !hasGenerated) {
-      handleGenerate();
-    }
-  }, []);
-
-  const handleGenerate = async () => {
+  const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
     
     setIsGenerating(true);
@@ -37,9 +30,7 @@ const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
       const { mermaid } = await response.json();
       
       // Convert Mermaid to Excalidraw elements
-      const { elements } = await parseMermaidToExcalidraw(mermaid, {
-        fontSize: 16,
-      });
+      const { elements } = await parseMermaidToExcalidraw(mermaid);
       
       updateAttributes({ data: { elements, appState: {} } });
       setHasGenerated(true);
@@ -49,7 +40,14 @@ const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [prompt, updateAttributes]);
+
+  useEffect(() => {
+    // Auto-generate when component is first created with a prompt
+    if (prompt && !hasGenerated) {
+      handleGenerate();
+    }
+  }, [prompt, hasGenerated, handleGenerate]);
 
   return (
     <NodeViewWrapper className="kine-diagram-block my-8">
