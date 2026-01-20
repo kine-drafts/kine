@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Critical for Excalidraw to work in App Router
+  // This prevents the "ESM" error that often breaks Excalidraw in Next.js
   transpilePackages: ['@excalidraw/excalidraw', '@excalidraw/mermaid-to-excalidraw'],
 };
 
