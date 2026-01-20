@@ -1,21 +1,24 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Plus } from 'lucide-react';
 
-// Dynamically import DiagramNode with no SSR
-const DiagramNode = dynamic(
-  () => import('@/components/DiagramNode').then(mod => ({ default: mod.DiagramNode })),
-  { ssr: false }
-);
-
 export default function Home() {
+  const [DiagramNode, setDiagramNode] = useState<any>(null);
+
+  useEffect(() => {
+    // Import DiagramNode only on client-side
+    import('@/components/DiagramNode').then((mod) => {
+      setDiagramNode(mod.DiagramNode);
+    });
+  }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
-      DiagramNode as any,
+      ...(DiagramNode ? [DiagramNode] : []),
     ],
     content: `
       <h2>Welcome to Kine.</h2>
@@ -27,7 +30,7 @@ export default function Home() {
         class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[50vh]',
       },
     },
-  });
+  }, [DiagramNode]);
 
   const addDiagram = () => {
     editor?.chain().focus().insertContent({ type: 'diagram', attrs: {} }).run();
