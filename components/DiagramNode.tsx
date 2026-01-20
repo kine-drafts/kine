@@ -1,29 +1,30 @@
-import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
+import { NodeViewWrapper, ReactNodeViewRenderer, NodeViewProps } from '@tiptap/react';
 import { Node } from '@tiptap/core';
 import { Excalidraw } from '@excalidraw/excalidraw';
 import React, { useState } from 'react';
+import type { ExcalidrawElement, AppState } from '@excalidraw/excalidraw/types/types';
 
-// 1. The React Component that renders the diagram
-const DiagramComponent = ({ node, updateAttributes }) => {
+interface DiagramData {
+  elements?: ExcalidrawElement[];
+  appState?: Partial<AppState>;
+}
+
+// The React Component that renders the diagram
+const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
     <NodeViewWrapper className="kine-diagram-block my-8">
-      {/* Container with a border to look like a 'card' in the doc */}
       <div className="border border-gray-200 rounded-lg overflow-hidden h-[500px] relative bg-white shadow-sm hover:shadow-md transition-shadow">
         
-        {/* The Excalidraw Canvas */}
         <Excalidraw
           initialData={node.attrs.data || null}
-          onChange={(elements, state) => {
-            // Save state back to the document JSON
-            // We use a debounce here in production to prevent lag
-             updateAttributes({ data: { elements, appState: state } });
+          onChange={(elements: readonly ExcalidrawElement[], state: AppState) => {
+            updateAttributes({ data: { elements: [...elements], appState: state } });
           }}
-          UIOptions={{ canvasActions: { loadScene: false } }} // Hide clutter
+          UIOptions={{ canvasActions: { loadScene: false } }}
         />
 
-        {/* Overlay to prevent accidental clicks while scrolling */}
         {!isEditing && (
           <div 
             className="absolute inset-0 bg-transparent cursor-pointer z-10"
@@ -38,16 +39,16 @@ const DiagramComponent = ({ node, updateAttributes }) => {
   );
 };
 
-// 2. The Tiptap Node Definition
+// The Tiptap Node Definition
 export const DiagramNode = Node.create({
   name: 'diagram',
   group: 'block',
-  atom: true, // It is a single unit, not text
+  atom: true,
 
   addAttributes() {
     return {
       data: {
-        default: null,
+        default: null as DiagramData | null,
       },
     };
   },
