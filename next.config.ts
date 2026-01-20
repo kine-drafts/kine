@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // This prevents the "ESM" error that often breaks Excalidraw in Next.js
+  // 1. This prevents the "Unexpected token export" error from Excalidraw
   transpilePackages: ['@excalidraw/excalidraw', '@excalidraw/mermaid-to-excalidraw'],
 };
 
