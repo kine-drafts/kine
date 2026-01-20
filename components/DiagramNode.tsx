@@ -2,11 +2,10 @@ import { NodeViewWrapper, ReactNodeViewRenderer, NodeViewProps } from '@tiptap/r
 import { Node } from '@tiptap/core';
 import { Excalidraw } from '@excalidraw/excalidraw';
 import React, { useState } from 'react';
-import type { ExcalidrawElement, AppState } from '@excalidraw/excalidraw/types/types';
 
 interface DiagramData {
-  elements?: ExcalidrawElement[];
-  appState?: Partial<AppState>;
+  elements?: any[];
+  appState?: any;
 }
 
 // The React Component that renders the diagram
@@ -19,7 +18,7 @@ const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
         
         <Excalidraw
           initialData={node.attrs.data || null}
-          onChange={(elements: readonly ExcalidrawElement[], state: AppState) => {
+          onChange={(elements: readonly any[], state: any) => {
             updateAttributes({ data: { elements: [...elements], appState: state } });
           }}
           UIOptions={{ canvasActions: { loadScene: false } }}
