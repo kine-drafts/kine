@@ -23,7 +23,8 @@ export default function Home() {
     content: `
       <h2>Welcome to Kine.</h2>
       <p>This is a text-based diagramming tool. Type anywhere to write text.</p>
-      <p>Click the "Add Diagram" button below to insert a whiteboard.</p>
+      <p>Select any text, then click "Insert Diagram" to generate a diagram based on your selection.</p>
+      <p>Try selecting this: user authentication flow with login, registration, and password reset</p>
     `,
     editorProps: {
       attributes: {
@@ -33,7 +34,27 @@ export default function Home() {
   }, [DiagramNode]);
 
   const addDiagram = () => {
-    editor?.chain().focus().insertContent({ type: 'diagram', attrs: {} }).run();
+    if (!editor) return;
+    
+    // Get the selected text
+    const { from, to } = editor.state.selection;
+    const selectedText = editor.state.doc.textBetween(from, to, ' ');
+    
+    if (!selectedText.trim()) {
+      alert('Please select some text first to describe what diagram you want to generate.');
+      return;
+    }
+
+    // Insert the diagram with the selected text as the prompt
+    editor
+      .chain()
+      .focus()
+      .deleteSelection() // Remove the selected text
+      .insertContent({ 
+        type: 'diagram', 
+        attrs: { prompt: selectedText } 
+      })
+      .run();
   };
 
   if (!editor) return null;
