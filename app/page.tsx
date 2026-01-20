@@ -1,15 +1,21 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { DiagramNode } from '@/components/DiagramNode'; // Ensure you created this above
 import { Plus } from 'lucide-react';
+
+// Dynamically import DiagramNode with no SSR
+const DiagramNode = dynamic(
+  () => import('@/components/DiagramNode').then(mod => ({ default: mod.DiagramNode })),
+  { ssr: false }
+);
 
 export default function Home() {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      DiagramNode,
+      DiagramNode as any,
     ],
     content: `
       <h2>Welcome to Kine.</h2>
