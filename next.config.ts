@@ -4,14 +4,9 @@ const nextConfig: NextConfig = {
   // 1. Handle Excalidraw imports
   transpilePackages: ['@excalidraw/excalidraw', '@excalidraw/mermaid-to-excalidraw'],
   
-  // 2. Ignore TypeScript errors during build (Focus on functionality first)
+  // 2. Ignore TypeScript errors (Strict Mode is too strict for now)
   typescript: {
     ignoreBuildErrors: true,
-  },
-  
-  // 3. Ignore ESLint errors during build
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 };
 
