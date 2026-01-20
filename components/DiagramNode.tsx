@@ -21,22 +21,36 @@ const DiagramComponent = ({ node, updateAttributes }: NodeViewProps) => {
     
     setIsGenerating(true);
     try {
+      console.log('Generating diagram with prompt:', prompt);
+      
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       });
       
-      const { mermaid } = await response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Received mermaid:', data.mermaid);
+      
+      if (!data.mermaid) {
+        throw new Error('No mermaid diagram returned from API');
+      }
       
       // Convert Mermaid to Excalidraw elements
-      const { elements } = await parseMermaidToExcalidraw(mermaid);
+      const { elements } = await parseMermaidToExcalidraw(data.mermaid);
+      console.log('Converted to elements:', elements);
       
       updateAttributes({ data: { elements, appState: {} } });
       setHasGenerated(true);
     } catch (error) {
       console.error('Error generating diagram:', error);
-      alert('Failed to generate diagram. Please try again.');
+      alert(`Failed to generate diagram: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsGenerating(false);
     }
