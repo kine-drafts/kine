@@ -37,7 +37,13 @@ export default function Home() {
     if (!editor) return;
     
     // Get the selected text
-    const { from, to } = editor.state.selection;
+    const { from, to, empty } = editor.state.selection;
+    
+    if (empty) {
+      alert('Please select some text first to describe what diagram you want to generate.');
+      return;
+    }
+    
     const selectedText = editor.state.doc.textBetween(from, to, ' ');
     
     if (!selectedText.trim()) {
@@ -45,15 +51,17 @@ export default function Home() {
       return;
     }
 
-    // Insert the diagram with the selected text as the prompt
+    // Insert diagram at the end of the selection WITHOUT deleting the text
+    const insertPos = to;
+    
     editor
       .chain()
       .focus()
-      .deleteSelection() // Remove the selected text
-      .insertContent({ 
-        type: 'diagram', 
-        attrs: { prompt: selectedText } 
-      })
+      .insertContentAt(insertPos, [
+        { type: 'paragraph' },
+        { type: 'diagram', attrs: { prompt: selectedText } },
+        { type: 'paragraph' },
+      ])
       .run();
   };
 
